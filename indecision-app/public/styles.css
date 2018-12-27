@@ -1,0 +1,12 @@
+.encWordSpace {
+    display: inline-block;
+    /*height:*/
+    width: 40px;
+}
+
+.encWordLetter {
+    display: inline-block;
+    /*height:*/
+    width: 30px;
+    /*ponerle bordes y toda la boludes de colorcitos etc*/
+}
