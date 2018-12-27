@@ -2,76 +2,36 @@
 
 console.log('App.js is running');
 var app = {
-    title: 'Hangman',
-    subtitle: ''
+    title: 'Indecision App',
+    subtitle: 'IDK',
+    options: []
 };
-var failsLimit = 6;
-var abc = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-
-var word = undefined;
-var encWord = [];
-var failsCounter = 0;
-var gameStatus = false;
-var endMessage = '';
-
-////
-var onWordSubmit = function onWordSubmit(e) {
+var onFormSubmit = function onFormSubmit(e) {
     e.preventDefault();
-    getWord(e);
-    getEncWord();
-    gameStatus = true;
-    renderApp();
-};
-
-var getWord = function getWord(e) {
-    var auxWord = e.target.elements.word.value;
-    auxWord = auxWord.toUpperCase();
-    word = auxWord.split("");
-    e.target.elements.word.value = '';
-};
-
-var getEncWord = function getEncWord() {
-    encWord = [];
-    word.forEach(function (l) {
-        return l == ' ' ? encWord.push(' ') : encWord.push('_');
-    });
-};
-////
-var onLetterSubmit = function onLetterSubmit(e) {
-    searchLetter(e.target.value);
-    checkGameStatus();
-    e.target.disabled = true;
-    renderApp();
-};
-
-var searchLetter = function searchLetter(letter) {
-    var flagAssert = false;
-    word.forEach(function (l, index) {
-        if (l == letter) {
-            encWord[index] = letter;
-            flagAssert = true;
-        }
-    });
-    flagAssert ? undefined : failsCounter++;
-};
-
-var checkGameStatus = function checkGameStatus() {
-    if (failsCounter >= failsLimit) {
-        gameStatus = false;
-        failsCounter = 0;
-        endMessage = 'Game Over';
-    } else if (!encWord.includes('_')) {
-        gameStatus = false;
-        failsCounter = 0;
-        endMessage = 'You win';
+    var option = e.target.elements.option.value;
+    if (option && !app.options.includes(option)) {
+        app.options.push(option);
+        e.target.elements.option.value = '';
+        renderApp();
     }
 };
-////
-
-var getClassName = function getClassName(l) {
-    return l == ' ' ? 'encWordSpace' : 'encWordLetter';
+var onRemoveAll = function onRemoveAll() {
+    app.options = [];
+    renderApp();
 };
-
+var onRemove = function onRemove(e) {
+    var optionsAux = app.options;
+    app.options = [];
+    optionsAux.forEach(function (o) {
+        if (o != e.target.value) app.options.push(o);
+    });
+    renderApp();
+};
+var onMakeDecision = function onMakeDecision() {
+    var randomNum = Math.floor(Math.random() * app.options.length);
+    var option = app.options[randomNum];
+    alert(option);
+};
 var appRoot = document.getElementById('app');
 var renderApp = function renderApp() {
     var template = React.createElement(
@@ -87,62 +47,46 @@ var renderApp = function renderApp() {
             null,
             app.subtitle
         ),
-        !gameStatus && React.createElement(
-            'div',
+        React.createElement(
+            'p',
             null,
-            React.createElement(
-                'form',
-                { onSubmit: onWordSubmit },
-                React.createElement(
-                    'span',
-                    null,
-                    'Write a word '
-                ),
-                React.createElement('input', { type: 'password', name: 'word', pattern: '[A-Za-z ]{3,30}' }),
-                React.createElement(
-                    'button',
-                    null,
-                    'Let\'s Play'
-                )
-            ),
-            endMessage && React.createElement(
-                'p',
-                null,
-                endMessage
-            )
+            app.options && app.options.length > 0 ? 'Here are your options' : 'No options'
         ),
-        gameStatus && React.createElement(
-            'div',
+        React.createElement(
+            'button',
+            { disabled: app.options.length < 2, onClick: onMakeDecision },
+            'What Should I Do?'
+        ),
+        React.createElement(
+            'button',
+            { onClick: onRemoveAll },
+            'Remove All'
+        ),
+        React.createElement(
+            'ol',
             null,
-            React.createElement(
-                'h3',
-                null,
-                encWord.map(function (l, index) {
-                    return React.createElement(
-                        'span',
-                        { className: getClassName(l), key: index },
-                        l
-                    );
-                })
-            ),
-            React.createElement(
-                'div',
-                null,
-                abc.map(function (l) {
-                    return React.createElement(
+            app.options.map(function (option) {
+                return option ? React.createElement(
+                    'li',
+                    { key: option },
+                    option,
+                    ' ',
+                    React.createElement(
                         'button',
-                        { onClick: onLetterSubmit, value: l, key: l },
-                        l
-                    );
-                })
-            ),
+                        { onClick: onRemove, key: option, value: option },
+                        'Remove'
+                    )
+                ) : undefined;
+            })
+        ),
+        React.createElement(
+            'form',
+            { onSubmit: onFormSubmit },
+            React.createElement('input', { type: 'text', name: 'option' }),
             React.createElement(
-                'p',
+                'button',
                 null,
-                'Fails: ',
-                failsCounter,
-                ' of ',
-                failsLimit
+                'Add Option'
             )
         )
     );
@@ -150,17 +94,4 @@ var renderApp = function renderApp() {
 };
 renderApp();
 
-/*
-//FALTA VALIDAR LA SUBIDA DE PALABRA
-
-//boton de restart
-//que se suba tipo password con el ojito
-//que al pulsar en el teclado sea como pulsar el boton de la pantalla
-//pasar el proyecto a visual studio
-
-//generar palabras automaticas con SQL(word, FK_type, FK_Language)
-//en el menu se podran seleccionar por:
-//-por tipo
-//-random
-//-en random hay pista opcional
-//darle un poco de estilos con bootstrap y eso*/
+//form validation

@@ -7,7 +7,7 @@ const app = {
 const onFormSubmit = (e) =>{
     e.preventDefault();
     const option = e.target.elements.option.value;
-    if(option){
+    if(option && !app.options.includes(option)){
         app.options.push(option);
         e.target.elements.option.value = '';
         renderApp();
@@ -15,6 +15,15 @@ const onFormSubmit = (e) =>{
 };
 const onRemoveAll = () =>{
     app.options = [];
+    renderApp();
+};
+const onRemove = (e) =>{
+    const optionsAux = app.options;
+    app.options = [];
+    optionsAux.forEach(o => {
+        if(o != e.target.value)   
+            app.options.push(o);
+    });
     renderApp();
 };
 const onMakeDecision = () =>{
@@ -33,7 +42,7 @@ const renderApp = () => {
             <button onClick={onRemoveAll}>Remove All</button>
             <ol>
             {
-                app.options.map((option) => <li key={option}>{option}</li>)
+                app.options.map((option) => option ? <li key={option}>{option} <button onClick={onRemove} key={option} value={option}>Remove</button></li> : undefined)
             }
             </ol>
             <form onSubmit={onFormSubmit}>
@@ -47,5 +56,5 @@ const renderApp = () => {
 };
 renderApp();
 
-//falta el remove individual
-//que no se puedan repetir
+
+//form validation
